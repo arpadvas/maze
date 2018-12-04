@@ -26,8 +26,6 @@ const msgs: Message[] = [];
 const sounds: Sound[] = [];
 const npcs: Hero[] = [];
 const items: Item[] = [];
-let gameArea: GameArea = new GameArea(document.createElement("canvas"));
-let map: Map = new Map();
 let then: number;
 let isNonWalkableAreaFilled = false;
 let now: any;
@@ -38,7 +36,12 @@ let crash: Crash = {
     top: false,
     bottom: false
 };
-let game: Game = new Game([], 0);
+let game: Game = new Game(
+    [],
+    0,
+    new GameArea(document.createElement("canvas")),
+    new Map()
+);
 
 // initialize atlases
 const characterAtlas = new Image();
@@ -83,7 +86,7 @@ export function startGame() {
     msgs[1] = new Message(texts[0], 130, 35);
     msgs[0].text = texts[11];
     game.textFrame = -300;
-    gameArea.start(main);
+    game.gameArea.start(main);
   }
 
 function collectNonWalkableArea(array: Item[] | Hero[]) {
@@ -97,7 +100,7 @@ function collectNonWalkableArea(array: Item[] | Hero[]) {
 function renderItems() {
     for (let i = 0; i < items.length; i++) {
         if (items[i].acted === 0 || items[i].acted === 1) {
-          items[i].render(gameArea.context);
+          items[i].render(game.gameArea.context);
           if (items[i].type === "torch") {
             items[i].burn();
           }
@@ -107,7 +110,7 @@ function renderItems() {
 
 function renderMsgs() {
     for (let i = 0; i < msgs.length; i++) {
-        msgs[i].render(gameArea.context);
+        msgs[i].render(game.gameArea.context);
         msgs[i].zero(game, msgs);
     }
 }
@@ -125,49 +128,49 @@ function update(modifier: number) {
         game.isGameOver = true;
         msgs[0].text = texts[14];
     }
-    if (gameArea.key && gameArea.key == 37 && crash.left === false) {
+    if (game.gameArea.key && game.gameArea.key == 37 && crash.left === false) {
         hero.sourceY = 16;
         hero.sourceX = spriteTiles.coordinatesLeft[spriteTiles.frameLeft];
         hero.x -= hero.speed * modifier;
         spriteTiles.frameLeft = (spriteTiles.frameLeft + 1) % spriteTiles.coordinatesLeft.length;
         sounds[4].play();
     }
-    if (gameArea.key && gameArea.key == 39 && crash.right === false) {
+    if (game.gameArea.key && game.gameArea.key == 39 && crash.right === false) {
         hero.sourceY = 32;
         hero.sourceX = spriteTiles.coordinatesRight[spriteTiles.frameRight];
         hero.x += hero.speed * modifier;
         spriteTiles.frameRight = (spriteTiles.frameRight + 1) % spriteTiles.coordinatesRight.length;
         sounds[4].play();
     }
-    if (gameArea.key && gameArea.key == 38 && crash.top === false) {
+    if (game.gameArea.key && game.gameArea.key == 38 && crash.top === false) {
         hero.sourceY = 48;
         hero.sourceX = spriteTiles.coordinatesTop[spriteTiles.frameTop];
         hero.y -= hero.speed * modifier; 
         spriteTiles.frameTop = (spriteTiles.frameTop + 1) % spriteTiles.coordinatesTop.length;
         sounds[4].play();
     }
-    if (gameArea.key && gameArea.key == 40 && crash.bottom === false) {
+    if (game.gameArea.key && game.gameArea.key == 40 && crash.bottom === false) {
         hero.sourceY = 0;
         hero.sourceX = spriteTiles.coordinatesBottom[spriteTiles.frameBottom];
         hero.y += hero.speed * modifier; 
         spriteTiles.frameBottom = (spriteTiles.frameBottom + 1) % spriteTiles.coordinatesBottom.length;
         sounds[4].play();
     } 
-    if (gameArea.key && (gameArea.key == 79 || gameArea.key == 83 || gameArea.key == 75)) {
-        checkIfItemActionable(gameArea.key, items, hero, msgs, game, sounds, npcs, makeItemWalkable);
+    if (game.gameArea.key && (game.gameArea.key == 79 || game.gameArea.key == 83 || game.gameArea.key == 75)) {
+        checkIfItemActionable(game.gameArea.key, items, hero, msgs, game, sounds, npcs, makeItemWalkable);
     }
-    if (gameArea.key && gameArea.key == 84) {
+    if (game.gameArea.key && game.gameArea.key == 84) {
         if (isNpcTalked === false) {
           talkToNpc(npcs, hero, msgs, game, items);
           isNpcTalked = true;
         }
     }
-    if (gameArea.key && gameArea.key == 72) {
+    if (game.gameArea.key && game.gameArea.key == 72) {
         msgs[0].text = texts[12];
         msgs[1].text = texts[13];
         game.textFrame = -600;
     }
-    if (gameArea.key === undefined) {
+    if (game.gameArea.key === undefined) {
         hero.sourceX = 16;
         hero.sourceY = 0;
         isNpcTalked = false;
@@ -177,20 +180,20 @@ function update(modifier: number) {
 function main() {
     now = Date.now();
     const delta = now - then;
-    gameArea.clear();
-    map.tileCreator(0, gameArea.context, isNonWalkableAreaFilled);
-    map.tileCreator(1, gameArea.context, isNonWalkableAreaFilled);
+    game.gameArea.clear();
+    game.map.tileCreator(0, game.gameArea.context, isNonWalkableAreaFilled);
+    game.map.tileCreator(1, game.gameArea.context, isNonWalkableAreaFilled);
     if (!isNonWalkableAreaFilled) {
-        game.nonWalkableArea = map.nonWalkableArea;
+        game.nonWalkableArea = game.map.nonWalkableArea;
         collectNonWalkableArea(npcs);
         collectNonWalkableArea(items);
     }
     isNonWalkableAreaFilled = true;
-    collisionDetection(game.nonWalkableArea, hero, crash, gameArea.canvas);
+    collisionDetection(game.nonWalkableArea, hero, crash, game.gameArea.canvas);
     update(delta/1000);
     renderItems();
-    hero.render(gameArea.context);
-    npcs[0].render(gameArea.context);
+    hero.render(game.gameArea.context);
+    npcs[0].render(game.gameArea.context);
     renderMsgs();
     then = now;
     if (game.isGameOver === false) {
