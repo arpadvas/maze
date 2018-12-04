@@ -3,6 +3,7 @@ import { NonWalkableArea } from "./non-walkable-area";
 export class Game {
 
     nonWalkableArea: NonWalkableArea[];
+    isGameOver: boolean = false;
     private _textFrame: number;
 
     constructor(

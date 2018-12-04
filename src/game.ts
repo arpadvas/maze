@@ -30,7 +30,6 @@ let gameArea: GameArea = new GameArea(document.createElement("canvas"));
 let map: Map = new Map();
 let then: number;
 let isNonWalkableAreaFilled = false;
-var isGameOver = false;
 let now: any;
 let isNpcTalked = false;
 let crash: Crash = {
@@ -123,7 +122,7 @@ function makeItemWalkable(item: Item) {
 
 function update(modifier: number) {
     if (hero.y < 0) {
-        isGameOver = true;
+        game.isGameOver = true;
         msgs[0].text = texts[14];
     }
     if (gameArea.key && gameArea.key == 37 && crash.left === false) {
@@ -194,7 +193,7 @@ function main() {
     npcs[0].render(gameArea.context);
     renderMsgs();
     then = now;
-    if (isGameOver === false) {
+    if (game.isGameOver === false) {
       window.requestAnimationFrame(main);
     }
 }
