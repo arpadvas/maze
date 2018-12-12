@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/arpadvas/maze#readme",
   "devDependencies": {
+    "@types/lodash": "^4.14.119",
     "clean-webpack-plugin": "^1.0.0",
     "css-loader": "^1.0.1",
     "file-loader": "^2.0.0",
@@ -31,5 +32,8 @@
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.10",
     "webpack-merge": "^4.1.4"
+  },
+  "dependencies": {
+    "lodash": "^4.17.10"
   }
 }
