@@ -32,14 +32,10 @@ export class Game {
     private _map: Map;
     private _nonWalkableArea: NonWalkableArea[];
     private _isNpcTalked: boolean;
-    private _atlas: Atlas;
 
     constructor(
             gameArea: GameArea,
             map: Map,
-            characterAtlas: HTMLImageElement,
-            otherAtlas: HTMLImageElement,
-            itemAtlas: HTMLImageElement,
             gameSounds: Array<GameSound>,
             hero: Hero,
             npcs: Hero[],
@@ -50,11 +46,7 @@ export class Game {
         this._textFrame = 0;
         this._gameArea = gameArea;
         this._map = map;
-        this._atlas = {
-            characterAtlas: new Image(),
-            otherAtlas: new Image(),
-            itemAtlas: new Image()
-        };
+
         this._crash = {
             left: false,
             right: false,
@@ -63,9 +55,6 @@ export class Game {
         };
         this._isNonWalkableAreaFilled = false;
         this._isNpcTalked = false;
-        this._atlas.characterAtlas.src = characterAtlas;
-        this._atlas.otherAtlas.src = otherAtlas;
-        this._atlas.itemAtlas.src = itemAtlas;
         this._gameSounds = gameSounds;
         this._hero = hero;
         this._npcs = npcs;
@@ -84,7 +73,7 @@ export class Game {
 
     private startGame() {
         this.createSounds(this._gameSounds);
-        this.playBackgroundSound(this._sounds);
+        // this.playBackgroundSound(this._sounds);
         this._then = Date.now();
         this._msgs[0].text = texts[11];
         this._textFrame = -300;
