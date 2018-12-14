@@ -73,7 +73,7 @@ export class Game {
 
     private startGame() {
         this.createSounds(this._gameSounds);
-        // this.playBackgroundSound(this._sounds);
+        this.playBackgroundSound(this._sounds);
         this._collisionDetection = new CollisionDetection();
         this._then = Date.now();
         this._msgs[0].text = texts[11];
@@ -100,6 +100,42 @@ export class Game {
         }
     }
 
+    private collectNonWalkableArea(array: Item[] | Hero[]) {
+        for (let i = 0; i < array.length; i++) {
+            if (array[i].nonWalkableArea) {
+                this._nonWalkableArea.push(array[i].nonWalkableArea);
+            }
+        }
+    }
+    
+    private renderItems() {
+        for (let i = 0; i < this._items.length; i++) {
+            if (this._items[i].acted === 0 || this._items[i].acted === 1) {
+                this._items[i].render(this._gameArea.context);
+              if (this._items[i].type === "torch") {
+                this._items[i].burn();
+              }
+            }  
+        }
+    }
+    
+    private renderMsgs() {
+        for (let i = 0; i < this._msgs.length; i++) {
+            this._msgs[i].render(this._gameArea.context);
+            this._msgs[i].zero(this, this._msgs);
+        }
+    }
+
+    private renderHero() {
+        this._hero.render(this._gameArea.context);
+    }
+
+    private renderNpcs() {
+        for (let i = 0; i < this._npcs.length; i++) {
+            this._npcs[i].render(this._gameArea.context);
+        }
+    }
+
     private main = () => {
         this._now = Date.now();
         const delta = this._now - this._then;
@@ -115,38 +151,12 @@ export class Game {
         this._crash = this._collisionDetection.detect(this._nonWalkableArea, this._hero, this._gameArea.canvas);
         this.update(delta/1000);
         this.renderItems();
-        this._hero.render(this._gameArea.context);
-        this._npcs[0].render(this._gameArea.context);
+        this.renderHero();
+        this.renderNpcs();
         this.renderMsgs();
         this._then = this._now;
         if (this._isGameOver === false) {
           window.requestAnimationFrame(this.main);
-        }
-    }
-
-    collectNonWalkableArea(array: Item[] | Hero[]) {
-        for (let i = 0; i < array.length; i++) {
-            if (array[i].nonWalkableArea) {
-                this._nonWalkableArea.push(array[i].nonWalkableArea);
-            }
-        }
-    }
-    
-    renderItems() {
-        for (let i = 0; i < this._items.length; i++) {
-            if (this._items[i].acted === 0 || this._items[i].acted === 1) {
-                this._items[i].render(this._gameArea.context);
-              if (this._items[i].type === "torch") {
-                this._items[i].burn();
-              }
-            }  
-        }
-    }
-    
-    renderMsgs() {
-        for (let i = 0; i < this._msgs.length; i++) {
-            this._msgs[i].render(this._gameArea.context);
-            this._msgs[i].zero(this, this._msgs);
         }
     }
     
