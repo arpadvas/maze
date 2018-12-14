@@ -24,11 +24,11 @@ export class Entity {
         this.acted = acted;
     }
 
-    render(ctx: CanvasRenderingContext2D) {
+    public render(ctx: CanvasRenderingContext2D) {
         ctx.drawImage(this.image, this.sourceX, this.sourceY, this.swidth, this.sheight, this.x, this.y, this.width, this.height);
     }
     
-    acter() {
+    public acter() {
         this.acted = 1;
     }
 }
