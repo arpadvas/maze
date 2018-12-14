@@ -7,8 +7,7 @@ import { Sound } from "./sound";
 import { Item } from "./item";
 import { Crash } from "./crash";
 import { texts } from "../constants/texts";
-import { Atlas } from './atlas';
-import { collisionDetection } from '../collision';
+import { CollisionDetection } from '../collision';
 import { spriteTiles } from '../constants/tiles';
 import { talkToNpc, checkIfItemActionable } from '../action';
 import { GameSound, GameSoundType } from "../constants/sounds";
@@ -32,6 +31,7 @@ export class Game {
     private _map: Map;
     private _nonWalkableArea: NonWalkableArea[];
     private _isNpcTalked: boolean;
+    private _collisionDetection: CollisionDetection;
 
     constructor(
             gameArea: GameArea,
@@ -74,6 +74,7 @@ export class Game {
     private startGame() {
         this.createSounds(this._gameSounds);
         // this.playBackgroundSound(this._sounds);
+        this._collisionDetection = new CollisionDetection();
         this._then = Date.now();
         this._msgs[0].text = texts[11];
         this._textFrame = -300;
@@ -111,7 +112,7 @@ export class Game {
             this.collectNonWalkableArea(this._items);
         }
         this._isNonWalkableAreaFilled = true;
-        collisionDetection(this._nonWalkableArea, this._hero, this._crash, this._gameArea.canvas);
+        this._crash = this._collisionDetection.detect(this._nonWalkableArea, this._hero, this._gameArea.canvas);
         this.update(delta/1000);
         this.renderItems();
         this._hero.render(this._gameArea.context);
