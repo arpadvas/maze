@@ -40,7 +40,8 @@ export class Game {
             hero: Hero,
             npcs: Hero[],
             items: Item[],
-            msgs: Message[]
+            msgs: Message[],
+            collisionDetection: CollisionDetection
         ) {
         this._nonWalkableArea = [];
         this._textFrame = 0;
@@ -60,6 +61,7 @@ export class Game {
         this._npcs = npcs;
         this._items = items;
         this._msgs = msgs;
+        this._collisionDetection = collisionDetection;
         this.startGame();
     }
 
@@ -74,7 +76,6 @@ export class Game {
     private startGame() {
         this.createSounds(this._gameSounds);
         this.playBackgroundSound(this._sounds);
-        this._collisionDetection = new CollisionDetection();
         this._then = Date.now();
         this._msgs[0].text = texts[11];
         this._textFrame = -300;

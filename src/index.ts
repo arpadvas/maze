@@ -8,6 +8,7 @@ import { Hero } from './interfaces/hero';
 import { gameItems } from './constants/items';
 import { Message } from './interfaces/message';
 import { texts } from './constants/texts';
+import { collisionDetection } from './collision';
 
 // start game
 const button: HTMLElement = document.querySelector(".button");
@@ -26,7 +27,8 @@ button.addEventListener("click", () => {
     [
       new Message(texts[0], 130, 15),
       new Message(texts[0], 130, 35)
-    ]
+    ],
+    collisionDetection
   );
 });
 

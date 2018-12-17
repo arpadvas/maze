@@ -95,3 +95,5 @@ export class CollisionDetection {
         }
     }
 }
+
+export const collisionDetection = new CollisionDetection();
