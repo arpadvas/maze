@@ -5,8 +5,9 @@ import { Message } from "./interfaces/message";
 import { Sound } from "./interfaces/sound";
 import { NonWalkableArea } from "./interfaces/non-walkable-area";
 import { Game } from "./interfaces/game";
+import { Npc } from "./interfaces/npc";
 
-export function checkIfItemActionable(key: number, items: Item[], hero: Hero, msgs: Message[], game: Game, sounds: Sound[], npcs: Hero[], callback: Function) {
+export function checkIfItemActionable(key: number, items: Item[], hero: Hero, msgs: Message[], game: Game, sounds: Sound[], npcs: Npc[], callback: Function) {
     for (let i = 0; i < items.length; i++) {
         if (checkIfItemClose(items[i], hero) && (items[i].type === "door" || items[i].type === "chest") && key === 79) {
             items[i].opened = true;
@@ -38,7 +39,7 @@ export function checkIfItemActionable(key: number, items: Item[], hero: Hero, ms
     } 
 }
 
-function checkIfItemClose(item: Item | Hero, hero: Hero) {
+function checkIfItemClose(item: Item | Npc, hero: Hero) {
     var left = hero.x;
     var right = hero.x + (hero.width);
     var top = hero.y;
@@ -56,7 +57,7 @@ function checkIfItemClose(item: Item | Hero, hero: Hero) {
     return false;
 }
 
-function performAction(item: Item, sounds: Sound[], game: Game, msgs: Message[], items: Item[], npcs: Hero[], callback: Function) {
+function performAction(item: Item, sounds: Sound[], game: Game, msgs: Message[], items: Item[], npcs: Npc[], callback: Function) {
     if (item.opened === true && (item.type === "door" || item.type === "chest")) {
         if (item.doable === true) {
             item.open();
@@ -107,7 +108,7 @@ var stepThree = true;
 var stepFour = true;
 var stepFive = true;
 
-function afterActon(npcs: Hero[], items: Item[], msgs: Message[], game: Game) {
+function afterActon(npcs: Npc[], items: Item[], msgs: Message[], game: Game) {
     if (npcs[0].acted === 1 && stepOne) {
       stepOne = false;
       items[3].doable = true;
@@ -142,16 +143,16 @@ function afterActon(npcs: Hero[], items: Item[], msgs: Message[], game: Game) {
     }
 }
   
-export function talkToNpc(npcs: Hero[], hero: Hero, msgs: Message[], game: Game, items: Item[]) {
+export function talkToNpc(npcs: Npc[], hero: Hero, msgs: Message[], game: Game, items: Item[]) {
     for (let i = 0; i < npcs.length; i++) {
-        if (checkIfItemClose(npcs[i], hero) && npcs[i].type === "npc" && npcs[i].acted === 0) {
+        if (checkIfItemClose(npcs[i], hero) && npcs[i].acted === 0) {
           npcs[i].acter();
           afterActon(npcs, items, msgs, game);
           msgs[0].text = texts[6];
           msgs[1].text = texts[7];
           game.textFrame = -600;
         }
-        else if (checkIfItemClose(npcs[i], hero) && npcs[i].type === "npc" && npcs[i].acted === 1) {
+        else if (checkIfItemClose(npcs[i], hero) && npcs[i].acted === 1) {
           msgs[0].text = texts[15];
           game.textFrame = 0;
         }

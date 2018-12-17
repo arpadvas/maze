@@ -12,6 +12,7 @@ import { spriteTiles } from '../constants/tiles';
 import { talkToNpc, checkIfItemActionable } from '../action';
 import { GameSound, GameSoundType } from "../constants/sounds";
 import { find } from 'lodash';
+import { Npc } from "./npc";
 
 export class Game {
 
@@ -21,7 +22,7 @@ export class Game {
     private _then: number;
     private _sounds: Sound[] = [];
     private _hero: Hero;
-    private _npcs: Hero[] = [];
+    private _npcs: Npc[] = [];
     private _gameArea: GameArea;
     private _items: Item[] = [];
     private _msgs: Message[] = [];
@@ -32,15 +33,17 @@ export class Game {
     private _nonWalkableArea: NonWalkableArea[];
     private _isNpcTalked: boolean;
     private _collisionDetection: CollisionDetection;
+    private _isNeedToPlayBackgroundSound: boolean;
 
     constructor(
             gameArea: GameArea,
             map: Map,
             gameSounds: Array<GameSound>,
             hero: Hero,
-            npcs: Hero[],
+            npcs: Npc[],
             items: Item[],
             msgs: Message[],
+            isNeedToPlayBackgroundSound: boolean,
             collisionDetection: CollisionDetection
         ) {
         this._nonWalkableArea = [];
@@ -56,6 +59,7 @@ export class Game {
         };
         this._isNonWalkableAreaFilled = false;
         this._isNpcTalked = false;
+        this._isNeedToPlayBackgroundSound = isNeedToPlayBackgroundSound;
         this._gameSounds = gameSounds;
         this._hero = hero;
         this._npcs = npcs;
@@ -75,7 +79,9 @@ export class Game {
 
     private startGame() {
         this.createSounds(this._gameSounds);
-        this.playBackgroundSound(this._sounds);
+        if (this._isNeedToPlayBackgroundSound) {
+            this.playBackgroundSound(this._sounds);
+        }
         this._then = Date.now();
         this._msgs[0].text = texts[11];
         this._textFrame = -300;
@@ -101,7 +107,7 @@ export class Game {
         }
     }
 
-    private collectNonWalkableArea(array: Item[] | Hero[]) {
+    private collectNonWalkableArea(array: Item[] | Npc[]) {
         for (let i = 0; i < array.length; i++) {
             if (array[i].nonWalkableArea) {
                 this._nonWalkableArea.push(array[i].nonWalkableArea);

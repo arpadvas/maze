@@ -5,6 +5,7 @@ import { Map } from './interfaces/map';
 import CharacterAtlas from '../pics/characters.png';
 import { gameSounds } from './constants/sounds';
 import { Hero } from './interfaces/hero';
+import { Npc } from './interfaces/npc';
 import { gameItems } from './constants/items';
 import { Message } from './interfaces/message';
 import { texts } from './constants/texts';
@@ -21,13 +22,14 @@ button.addEventListener("click", () => {
     new GameArea(document.createElement("canvas")),
     new Map(),
     gameSounds,
-    new Hero(characterAtlas, 16, 0, 16, 16, 0, 112, 16, 16, 0, "hero", true),
-    [new Hero(characterAtlas, 64, 0, 16, 16, 272, 160, 16, 16, 0, "npc", false)],
+    new Hero(characterAtlas, 16, 0, 16, 16, 0, 112, 16, 16, 0),
+    [new Npc(characterAtlas, 64, 0, 16, 16, 272, 160, 16, 16, 0, false)],
     gameItems,
     [
       new Message(texts[0], 130, 15),
       new Message(texts[0], 130, 35)
     ],
+    false,
     collisionDetection
   );
 });
