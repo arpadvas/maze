@@ -1,4 +1,4 @@
-import { Item } from '../interfaces/item';
+import { Item } from '../classes/item';
 import OtherAtlas from '../../pics/things.png';
 import ItemAtlas from '../../pics/items.png';
 

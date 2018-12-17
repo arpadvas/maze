@@ -1,15 +1,15 @@
 import './style.css';
-import { Game } from './interfaces/game';
-import { GameArea } from './interfaces/game-area';
-import { Map } from './interfaces/map';
+import { Game } from './classes/game';
+import { GameArea } from './classes/game-area';
+import { Map } from './classes/map';
 import CharacterAtlas from '../pics/characters.png';
 import { gameSounds } from './constants/sounds';
-import { Hero } from './interfaces/hero';
-import { Npc } from './interfaces/npc';
+import { Hero } from './classes/hero';
+import { Npc } from './classes/npc';
 import { gameItems } from './constants/items';
-import { Message } from './interfaces/message';
+import { Message } from './classes/message';
 import { texts } from './constants/texts';
-import { collisionDetection } from './collision';
+import { collisionDetection } from './classes/collision-detection';
 
 // start game
 const button: HTMLElement = document.querySelector(".button");

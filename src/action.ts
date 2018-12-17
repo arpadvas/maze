@@ -1,11 +1,11 @@
-import { Item } from "./interfaces/item";
-import { Hero } from "./interfaces/hero";
+import { Item } from "./classes/item";
+import { Hero } from "./classes/hero";
 import { texts } from "./constants/texts";
-import { Message } from "./interfaces/message";
-import { Sound } from "./interfaces/sound";
-import { NonWalkableArea } from "./interfaces/non-walkable-area";
-import { Game } from "./interfaces/game";
-import { Npc } from "./interfaces/npc";
+import { Message } from "./classes/message";
+import { Sound } from "./classes/sound";
+import { NonWalkableArea } from "./classes/non-walkable-area";
+import { Game } from "./classes/game";
+import { Npc } from "./classes/npc";
 
 export function checkIfItemActionable(key: number, items: Item[], hero: Hero, msgs: Message[], game: Game, sounds: Sound[], npcs: Npc[], callback: Function) {
     for (let i = 0; i < items.length; i++) {

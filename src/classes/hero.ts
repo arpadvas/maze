@@ -1,5 +1,4 @@
 import { Entity } from "./entity";
-import { NonWalkableArea } from "./non-walkable-area";
 
 export class Hero extends Entity {
 

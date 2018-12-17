@@ -1,6 +1,6 @@
-import { NonWalkableArea } from "./interfaces/non-walkable-area";
-import { Hero } from "./interfaces/hero";
-import { Crash } from "./interfaces/crash";
+import { NonWalkableArea } from "./non-walkable-area";
+import { Hero } from "./hero";
+import { Crash } from "../interfaces/crash";
 
 export class CollisionDetection {
 
