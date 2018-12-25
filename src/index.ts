@@ -10,6 +10,7 @@ import { gameItems } from './constants/items';
 import { Message } from './classes/message';
 import { texts } from './constants/texts';
 import { collisionDetection } from './classes/collision-detection';
+import { actionOnEntities } from './classes/action-on-entities';
 
 // start game
 const button: HTMLElement = document.querySelector(".button");
@@ -22,15 +23,18 @@ button.addEventListener("click", () => {
     new GameArea(document.createElement("canvas")),
     new Map(),
     gameSounds,
-    new Hero(characterAtlas, 16, 0, 16, 16, 0, 112, 16, 16, 0),
-    [new Npc(characterAtlas, 64, 0, 16, 16, 272, 160, 16, 16, 0, false)],
+    new Hero(characterAtlas, 16, 0, 16, 16, 0, 112, 16, 16),
+    [
+      new Npc(characterAtlas, 64, 0, 16, 16, 272, 160, 16, 16, false, true, false, 0)
+    ],
     gameItems,
     [
       new Message(texts[0], 130, 15),
       new Message(texts[0], 130, 35)
     ],
     false,
-    collisionDetection
+    collisionDetection,
+    actionOnEntities
   );
 });
 

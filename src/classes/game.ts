@@ -9,10 +9,11 @@ import { Crash } from "../interfaces/crash";
 import { texts } from "../constants/texts";
 import { CollisionDetection } from './collision-detection';
 import { spriteTiles } from '../constants/tiles';
-import { talkToNpc, checkIfItemActionable } from '../action';
 import { GameSound, GameSoundType } from "../constants/sounds";
-import { find } from 'lodash';
+import { find, once } from 'lodash';
 import { Npc } from "./npc";
+import { Torch } from "./torch";
+import { ActionOnEntities } from "./action-on-entities";
 
 export class Game {
 
@@ -31,9 +32,9 @@ export class Game {
     private _gameSounds: Array<GameSound>;
     private _map: Map;
     private _nonWalkableArea: NonWalkableArea[];
-    private _isNpcTalked: boolean;
     private _collisionDetection: CollisionDetection;
     private _isNeedToPlayBackgroundSound: boolean;
+    private _actionOnEntities: ActionOnEntities;
 
     constructor(
             gameArea: GameArea,
@@ -44,7 +45,8 @@ export class Game {
             items: Item[],
             msgs: Message[],
             isNeedToPlayBackgroundSound: boolean,
-            collisionDetection: CollisionDetection
+            collisionDetection: CollisionDetection,
+            actionOnEntities: ActionOnEntities
         ) {
         this._nonWalkableArea = [];
         this._textFrame = 0;
@@ -58,7 +60,6 @@ export class Game {
             bottom: false
         };
         this._isNonWalkableAreaFilled = false;
-        this._isNpcTalked = false;
         this._isNeedToPlayBackgroundSound = isNeedToPlayBackgroundSound;
         this._gameSounds = gameSounds;
         this._hero = hero;
@@ -66,6 +67,7 @@ export class Game {
         this._items = items;
         this._msgs = msgs;
         this._collisionDetection = collisionDetection;
+        this._actionOnEntities = actionOnEntities;
         this.startGame();
     }
 
@@ -89,9 +91,9 @@ export class Game {
     }
 
     private createSounds(gameSounds: Array<GameSound>) {
-        for (let i = 1; i < gameSounds.length; i++) {
+        for (let i = 0; i < gameSounds.length; i++) {
             let newSound: Sound;
-            if (gameSounds[i].type === GameSoundType.JarbreakSound) {
+            if (gameSounds[i].type === GameSoundType.BackgroundSound) {
                 newSound = new Sound(gameSounds[i].src, 1, true, gameSounds[i].type);
             } else {
                 newSound = new Sound(gameSounds[i].src, 1, false, gameSounds[i].type);
@@ -109,8 +111,8 @@ export class Game {
 
     private collectNonWalkableArea(array: Item[] | Npc[]) {
         for (let i = 0; i < array.length; i++) {
-            if (array[i].nonWalkableArea) {
-                this._nonWalkableArea.push(array[i].nonWalkableArea);
+            if (array[i].getnonWalkableArea()) {
+                this._nonWalkableArea.push(array[i].getnonWalkableArea());
             }
         }
     }
@@ -119,7 +121,7 @@ export class Game {
         for (let i = 0; i < this._items.length; i++) {
             if (this._items[i].acted === 0 || this._items[i].acted === 1) {
                 this._items[i].render(this._gameArea.context);
-              if (this._items[i].type === "torch") {
+              if (this._items[i] instanceof Torch) {
                 this._items[i].burn();
               }
             }  
@@ -156,7 +158,7 @@ export class Game {
         }
         this._isNonWalkableAreaFilled = true;
         this._crash = this._collisionDetection.detect(this._nonWalkableArea, this._hero, this._gameArea.canvas);
-        this.update(delta/1000);
+        this.updateScreen(delta/1000);
         this.renderItems();
         this.renderHero();
         this.renderNpcs();
@@ -167,7 +169,7 @@ export class Game {
         }
     }
     
-    makeItemWalkable(item: Item) {
+    private makeItemWalkable(item: Item) {
         for (let i = 0; i < this._nonWalkableArea.length; i++) {
             if (this._nonWalkableArea[i].x === item.x && this._nonWalkableArea[i].y === item.y) {
                 this._nonWalkableArea.splice(i, 1);
@@ -175,7 +177,7 @@ export class Game {
           }
     }
     
-    update(modifier: number) {
+    private updateScreen(modifier: number) {
         const footSound: Sound = find(this._sounds, ['type', GameSoundType.FootSound]);
         if (this._hero.y < 0) {
             this._isGameOver = true;
@@ -217,14 +219,15 @@ export class Game {
                 footSound.play();
             }
         } 
-        if (this._gameArea.key && (this._gameArea.key == 79 || this._gameArea.key == 83 || this._gameArea.key == 75)) {
-            checkIfItemActionable(this._gameArea.key, this._items, this._hero, this._msgs, this, this._sounds, this._npcs, this.makeItemWalkable);
-        }
-        if (this._gameArea.key && this._gameArea.key == 84) {
-            if (this._isNpcTalked === false) {
-              talkToNpc(this._npcs, this._hero, this._msgs, this, this._items);
-              this._isNpcTalked = true;
+        if (this._gameArea.key && (this._gameArea.key == 79 || this._gameArea.key == 84 || this._gameArea.key == 66)) {
+            const actionResult: Item = this._actionOnEntities.tryActionOnEntity(this._gameArea.key, this._items, this._hero, this._msgs, this, this._sounds, this._npcs);
+            if (actionResult) {
+                this.makeItemWalkable(actionResult);
             }
+        }
+        if (this._gameArea.key && this._gameArea.key == 83) {
+            this._actionOnEntities.tryTalkToNpc(this._npcs, this._hero, this._msgs, this, this._items);
+            this._gameArea.key = undefined;
         }
         if (this._gameArea.key && this._gameArea.key == 72) {
             this._msgs[0].text = texts[12];
@@ -234,7 +237,6 @@ export class Game {
         if (this._gameArea.key === undefined) {
             this._hero.sourceX = 16;
             this._hero.sourceY = 0;
-            this._isNpcTalked = false;
         }
     }
 }

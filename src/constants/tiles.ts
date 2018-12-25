@@ -7,6 +7,11 @@ export const doorTiles = {
     coordinates : [0, 16, 16, 32, 32, 48],
     frame : 0
 };
+
+export const chestTiles = {
+    coordinates : [0, 16, 16, 32, 32, 48],
+    frame : 0
+};
   
 export const potTiles = {
     coordinates : [0, 16, 16, 32, 32, 48],

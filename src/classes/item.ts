@@ -1,67 +1,37 @@
 import { Entity } from "./entity";
 import { NonWalkableArea } from "./non-walkable-area";
-import { doorTiles, torchTiles, switchTiles, potTiles } from "../constants/tiles";
 
-export class Item extends Entity {
+export abstract class Item extends Entity {
 
-    type: string;
-    doable: boolean;
-    opened: boolean;
-    switched: boolean;
-    broken: boolean; 
-    private _nonWalkableArea: NonWalkableArea;
+    public walkable: boolean;
+    public canBeActioned: boolean;
+    public locked: boolean;
+    public acted: number;
 
-    constructor(image :HTMLImageElement, sourceX: number, sourceY: number, swidth: number, sheight: number, x: number, y: number, width: number, height: number, walkable: boolean, type: string, doable: boolean, acted: number) {
-        super(image, sourceX, sourceY, swidth, sheight, x, y, width, height, acted);
-        this.type = type;
-        this.doable = doable;
-        this.opened = false;
-        this.switched = false;
-        this.broken = false;
-        if (!walkable) {
-            this._nonWalkableArea = new NonWalkableArea(this.x, this.y, this.width, this.height);
-        }
+      constructor(image :HTMLImageElement, sourceX: number, sourceY: number, swidth: number, sheight: number, x: number, y: number, width: number, height: number, walkable: boolean, canBeActioned: boolean, locked: boolean, acted: number) {
+        super(image, sourceX, sourceY, swidth, sheight, x, y, width, height);
+        this.walkable = walkable;
+        this.canBeActioned = canBeActioned;
+        this.locked = locked;
+        this.acted = acted;
     }
 
-    get nonWalkableArea(): NonWalkableArea {
-        return this._nonWalkableArea;
+    abstract getnonWalkableArea(): NonWalkableArea;
+
+    public burn() {
+        return;
     }
 
-    open() {
-       this.sourceY = doorTiles.coordinates[doorTiles.frame];
-       if (doorTiles.frame != 5) {
-         doorTiles.frame = (doorTiles.frame + 1);
-       } 
-       else {
-         doorTiles.frame = 5;
-         this.opened = false;
-       }
+    public toggle() {
+        return;
     }
 
-    burn() {
-       this.sourceX = torchTiles.coordinates[torchTiles.frame];
-       torchTiles.frame = (torchTiles.frame + 1) % torchTiles.coordinates.length;
+    public open() {
+        return;
     }
 
-    switch() {
-       this.sourceX = switchTiles.coordinates[switchTiles.frame];
-       if (switchTiles.frame != 3) {
-         switchTiles.frame = (switchTiles.frame + 1);
-       } 
-       else {
-         switchTiles.frame = 3;
-         this.switched = false;
-       }
+    public break() {
+        return;
     }
 
-    kick() {
-       this.sourceY = potTiles.coordinates[potTiles.frame];
-       if (potTiles.frame != 5) {
-         potTiles.frame = (potTiles.frame + 1);
-       } 
-       else {
-         potTiles.frame = 5;
-         this.broken = false;
-       }
-    }
 }

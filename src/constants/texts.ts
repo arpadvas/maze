@@ -1,8 +1,8 @@
 export const texts = [
     " ", 
-    "You can't open this item!", 
-    "There is nothing to switch here!", 
-    "Do you wanna break your leg?", 
+    "There is nothing to open here!", 
+    "There is nothing to toggle here!", 
+    "There is nothing to break here!", 
     "What a luck! You found a bronze key!", 
     "What a luck! You found a silver key!", 
     "The monk gives you a parchment with one word on it:", 
@@ -12,7 +12,7 @@ export const texts = [
     "To use it find the password first!",
     "Press H for help!",
     "To control your character press arrow keys!",
-    "Open: 'O', Switch: 'S', Talk: 'T', Kick: 'K'",
+    "Open: 'O', Toggle: 'T', Speak: 'S', Break: 'B'",
     "You made it to get out! Hats off to you! :)",
     "Sorry Sir but I can't help you more..."
 ];
