@@ -1,7 +1,5 @@
 import { Npc } from "./npc";
 import { Hero } from "./hero";
-import { Message } from "./message";
-import { Game } from "./game";
 import { Item } from "./item";
 import { texts } from "../constants/texts";
 import { Sound } from "./sound";
@@ -11,54 +9,106 @@ import { find } from 'lodash';
 import { Door } from "./door";
 import { Chest } from "./chest";
 import { Pot } from "./pot";
+import { ActionResult, MessegeChange } from "../interfaces/action-result";
 
 export class ActionOnEntities {
 
-    public tryActionOnEntity(key: number, items: Item[], hero: Hero, msgs: Message[], game: Game, sounds: Sound[], npcs: Npc[]): Item {
+    public tryActionOnEntity(key: number, items: Item[], hero: Hero, sounds: Sound[]): ActionResult {
         for (let i = 0; i < items.length; i++) {
             if (key === 79) {
                 if (this.checkIfItemClose(items[i], hero) && items[i] instanceof Door) {
                     if (items[i].canBeActioned) {
-                        const doorActionResult: boolean = this.performDoorAction(items[i], sounds, game, msgs, items, npcs);
+                        const doorActionResult: [boolean, MessegeChange] = this.performDoorAction(items[i], sounds);
                         if (doorActionResult) {
-                            return items[i];
+                            if (doorActionResult[0]) {
+                                return {
+                                    item: items[i],
+                                    msgChange: null
+                                }
+                            } else if (doorActionResult[1]) {
+                                return {
+                                    item: null,
+                                    msgChange: doorActionResult[1]
+                                }
+                            }
                         }
                     }
                 } else if (this.checkIfItemClose(items[i], hero) && items[i] instanceof Chest) {
                     if (items[i].canBeActioned) {
-                        this.performChestAction(items[i], sounds, game, msgs, items, npcs);
+                        const chestActionResult: [boolean, MessegeChange] = this.performChestAction(items[i], sounds);
+                        if (chestActionResult) {
+                            if (chestActionResult[1]) {
+                                return {
+                                    item: null,
+                                    msgChange: chestActionResult[1]
+                                }
+                            }
+                        }
                     }
                 } else if (this.checkIfItemClose(items[i], hero) && !(items[i] instanceof Chest) && !(items[i] instanceof Door)) {
-                    msgs[0].text = texts[1];
-                    game.textFrame = 0;
+                    return {
+                        item: null,
+                        msgChange: {
+                            timeFrame: 0,
+                            value: texts[1]
+                        }
+                    }
                 }
             } else if (key === 84) {
                 if (this.checkIfItemClose(items[i], hero) && items[i] instanceof Toggle) {
                     if (items[i].canBeActioned) {
-                        this.performToggleAction(items[i], sounds, game, msgs, items, npcs);
+                        const toggleActionResult: [boolean, MessegeChange] = this.performToggleAction(items[i], sounds);
+                        if (toggleActionResult) {
+                            if (toggleActionResult[1]) {
+                                return {
+                                    item: null,
+                                    msgChange: toggleActionResult[1]
+                                }
+                            }
+                        }
                     }
                 } else if (this.checkIfItemClose(items[i], hero) && !(items[i] instanceof Toggle)) {
-                    msgs[0].text = texts[2];
-                    game.textFrame = 0;
+                    return {
+                        item: null,
+                        msgChange: {
+                            timeFrame: 0,
+                            value: texts[2]
+                        }
+                    }
                 }
             } else if (key === 66) {
                 if (this.checkIfItemClose(items[i], hero) && items[i] instanceof Pot) {
                     if (items[i].canBeActioned) {
-                        const potActionResult: boolean = this.performPotAction(items[i], sounds, game, msgs, items, npcs);
+                        const potActionResult: [boolean, MessegeChange] = this.performPotAction(items[i], sounds);
                         if (potActionResult) {
-                            return items[i];
+                            if (potActionResult[0]) {
+                                return {
+                                    item: items[i],
+                                    msgChange: null
+                                }
+                            } else if (potActionResult[1]) {
+                                return {
+                                    item: null,
+                                    msgChange: potActionResult[1]
+                                }
+                            }
                         }
                     }
                 } else if (this.checkIfItemClose(items[i], hero) && !(items[i] instanceof Pot)) {
-                    msgs[0].text = texts[3];
-                    game.textFrame = 0;
+                    return {
+                        item: null,
+                        msgChange: {
+                            timeFrame: 0,
+                            value: texts[3]
+                        }
+                    }
                 }
             }
         }
         return null;
     }
 
-    private performPotAction(item: Item, sounds: Sound[], game: Game, msgs: Message[], items: Item[], npcs: Npc[]): boolean {
+    private performPotAction(item: Item, sounds: Sound[]): [boolean, MessegeChange] {
         if (!item.locked) {
             if (item.acted === 0) {
                 const jarbreakSound: Sound = find(sounds, ['type', GameSoundType.JarbreakSound]);
@@ -66,16 +116,20 @@ export class ActionOnEntities {
                     jarbreakSound.play();
                 }
                 item.break();
-                return true;
+                return [true, null];
             }
         } else {
-            msgs[0].text = texts[9];
-            game.textFrame = 0;
+            return [
+                false,
+                {
+                    timeFrame: 0,
+                    value: texts[9]
+                }
+            ]
         }
-        return false;
     }
 
-    private performChestAction(item: Item, sounds: Sound[], game: Game, msgs: Message[], items: Item[], npcs: Npc[]): boolean {
+    private performChestAction(item: Item, sounds: Sound[]): [boolean, MessegeChange] {
         if (!item.locked) {
             if (item.acted === 0) {
                 const chestSound: Sound = find(sounds, ['type', GameSoundType.ChestSound]);
@@ -83,16 +137,20 @@ export class ActionOnEntities {
                     chestSound.play();
                 }
                 item.open();
-                return true;
             }
         } else {
-            msgs[0].text = texts[9];
-            game.textFrame = 0;
+            return [
+                false,
+                {
+                    timeFrame: 0,
+                    value: texts[9]
+                }
+            ]
         }
-        return false;
+        return [false, null];
     }
 
-    private performDoorAction(item: Item, sounds: Sound[], game: Game, msgs: Message[], items: Item[], npcs: Npc[]): boolean {
+    private performDoorAction(item: Item, sounds: Sound[]): [boolean, MessegeChange] {
         if (!item.locked) {
             if (item.acted === 0) {
                 const doorSound: Sound = find(sounds, ['type', GameSoundType.DoorSound]);
@@ -100,16 +158,20 @@ export class ActionOnEntities {
                     doorSound.play();
                 }
                 item.open();
-                return true;
+                return [true, null];
             }
         } else {
-            msgs[0].text = texts[9];
-            game.textFrame = 0;
+            return [
+                false,
+                {
+                    timeFrame: 0,
+                    value: texts[9]
+                }
+            ]
         }
-        return false;
     }
 
-    private performToggleAction(item: Item, sounds: Sound[], game: Game, msgs: Message[], items: Item[], npcs: Npc[]): boolean {
+    private performToggleAction(item: Item, sounds: Sound[]): [boolean, MessegeChange] {
         if (!item.locked) {
             if (item.acted === 0) {
                 const toggleSound: Sound = find(sounds, ['type', GameSoundType.SwitchSound]);
@@ -117,13 +179,17 @@ export class ActionOnEntities {
                     toggleSound.play();
                 }
                 item.toggle();
-                return true;
             }
         } else {
-            msgs[0].text = texts[10];
-            game.textFrame = 0;
+            return [
+                false,
+                {
+                    timeFrame: 0,
+                    value: texts[10]
+                }
+            ]
         }
-        return false;
+        return [false, null];
     }
 
     private checkIfItemClose(item: Item | Npc, hero: Hero) {
@@ -144,17 +210,26 @@ export class ActionOnEntities {
         return false;
     }
 
-    public tryTalkToNpc(npcs: Npc[], hero: Hero, msgs: Message[], game: Game, items: Item[]): any {
+    public tryTalkToNpc(npcs: Npc[], hero: Hero): ActionResult {
         for (let i = 0; i < npcs.length; i++) {
             if (this.checkIfItemClose(npcs[i], hero) && npcs[i].acted === 0) {
                 npcs[i].acted = 1;
-                //   afterActon(npcs, items, msgs, game);
-                msgs[0].text = texts[6];
-                msgs[1].text = texts[7];
-                game.textFrame = -600;
+                return {
+                    item: null,
+                    msgChange: {
+                        timeFrame: -600,
+                        value: texts[6],
+                        value2: texts[7]
+                    }
+                }
             } else if (this.checkIfItemClose(npcs[i], hero) && npcs[i].acted === 1) {
-                msgs[0].text = texts[15];
-                game.textFrame = 0;
+                return {
+                    item: null,
+                    msgChange: {
+                        timeFrame: 0,
+                        value: texts[15]
+                    }
+                }
             }
         }
     }

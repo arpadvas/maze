@@ -11,6 +11,7 @@ import { Message } from './classes/message';
 import { texts } from './constants/texts';
 import { collisionDetection } from './classes/collision-detection';
 import { actionOnEntities } from './classes/action-on-entities';
+import { Messenger } from './classes/messenger';
 
 // start game
 const button: HTMLElement = document.querySelector(".button");
@@ -28,13 +29,15 @@ button.addEventListener("click", () => {
       new Npc(characterAtlas, 64, 0, 16, 16, 272, 160, 16, 16, false, true, false, 0)
     ],
     gameItems,
-    [
-      new Message(texts[0], 130, 15),
-      new Message(texts[0], 130, 35)
-    ],
     false,
     collisionDetection,
-    actionOnEntities
+    actionOnEntities,
+    new Messenger(
+      [
+        new Message(texts[0], 130, 15),
+        new Message(texts[0], 130, 35)
+      ]
+    )
   );
 });
 

@@ -18,14 +18,4 @@ export class Message {
         ctx.fillStyle = "white";
         ctx.fillText(this.text, this.x, this.y);
     }
-    
-    zero(game: Game, msgs: Message[]) {
-        game.textFrame += 1;
-        if (game.textFrame === 300) {
-        game.textFrame = 0;
-          for (let i = 0; i < msgs.length; i += 1) {
-            msgs[i].text = texts[0];
-          }
-        }
-    }
 }

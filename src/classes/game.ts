@@ -2,7 +2,6 @@ import { NonWalkableArea } from "./non-walkable-area";
 import { GameArea } from "./game-area";
 import { Map } from "./map";
 import { Hero } from "./hero";
-import { Message } from "./message";
 import { Sound } from "./sound";
 import { Item } from "./item";
 import { Crash } from "../interfaces/crash";
@@ -14,11 +13,12 @@ import { find, once } from 'lodash';
 import { Npc } from "./npc";
 import { Torch } from "./torch";
 import { ActionOnEntities } from "./action-on-entities";
+import { Messenger } from "./messenger";
+import { ActionResult } from "../interfaces/action-result";
 
 export class Game {
 
     private _isGameOver: boolean = false;
-    private _textFrame: number;
     private _now: any;
     private _then: number;
     private _sounds: Sound[] = [];
@@ -26,7 +26,6 @@ export class Game {
     private _npcs: Npc[] = [];
     private _gameArea: GameArea;
     private _items: Item[] = [];
-    private _msgs: Message[] = [];
     private _crash: Crash;
     private _isNonWalkableAreaFilled: boolean;
     private _gameSounds: Array<GameSound>;
@@ -35,6 +34,7 @@ export class Game {
     private _collisionDetection: CollisionDetection;
     private _isNeedToPlayBackgroundSound: boolean;
     private _actionOnEntities: ActionOnEntities;
+    private _messenger: Messenger
 
     constructor(
             gameArea: GameArea,
@@ -43,13 +43,12 @@ export class Game {
             hero: Hero,
             npcs: Npc[],
             items: Item[],
-            msgs: Message[],
             isNeedToPlayBackgroundSound: boolean,
             collisionDetection: CollisionDetection,
-            actionOnEntities: ActionOnEntities
+            actionOnEntities: ActionOnEntities,
+            messenger: Messenger
         ) {
         this._nonWalkableArea = [];
-        this._textFrame = 0;
         this._gameArea = gameArea;
         this._map = map;
 
@@ -65,18 +64,10 @@ export class Game {
         this._hero = hero;
         this._npcs = npcs;
         this._items = items;
-        this._msgs = msgs;
         this._collisionDetection = collisionDetection;
         this._actionOnEntities = actionOnEntities;
+        this._messenger = messenger;
         this.startGame();
-    }
-
-    get textFrame() {
-        return this._textFrame;
-    }
-
-    set textFrame(number: number) {
-        this._textFrame = number;
     }
 
     private startGame() {
@@ -85,8 +76,8 @@ export class Game {
             this.playBackgroundSound(this._sounds);
         }
         this._then = Date.now();
-        this._msgs[0].text = texts[11];
-        this._textFrame = -300;
+        this._messenger.firstMsg = texts[11];
+        this._messenger.textFrame = -300;
         this._gameArea.start(this.main);
     }
 
@@ -127,13 +118,6 @@ export class Game {
             }  
         }
     }
-    
-    private renderMsgs() {
-        for (let i = 0; i < this._msgs.length; i++) {
-            this._msgs[i].render(this._gameArea.context);
-            this._msgs[i].zero(this, this._msgs);
-        }
-    }
 
     private renderHero() {
         this._hero.render(this._gameArea.context);
@@ -162,7 +146,7 @@ export class Game {
         this.renderItems();
         this.renderHero();
         this.renderNpcs();
-        this.renderMsgs();
+        this._messenger.renderMsgs(this._gameArea.context);
         this._then = this._now;
         if (this._isGameOver === false) {
           window.requestAnimationFrame(this.main);
@@ -181,7 +165,7 @@ export class Game {
         const footSound: Sound = find(this._sounds, ['type', GameSoundType.FootSound]);
         if (this._hero.y < 0) {
             this._isGameOver = true;
-            this._msgs[0].text = texts[14];
+            this._messenger.firstMsg = texts[14];
         }
         if (this._gameArea.key && this._gameArea.key == 37 && this._crash.left === false) {
             this._hero.sourceY = 16;
@@ -220,19 +204,32 @@ export class Game {
             }
         } 
         if (this._gameArea.key && (this._gameArea.key == 79 || this._gameArea.key == 84 || this._gameArea.key == 66)) {
-            const actionResult: Item = this._actionOnEntities.tryActionOnEntity(this._gameArea.key, this._items, this._hero, this._msgs, this, this._sounds, this._npcs);
+            const actionResult: ActionResult = this._actionOnEntities.tryActionOnEntity(this._gameArea.key, this._items, this._hero, this._sounds);
             if (actionResult) {
-                this.makeItemWalkable(actionResult);
+                if (actionResult.item) {
+                    this.makeItemWalkable(actionResult.item);
+                }
+                if (actionResult.msgChange) {
+                    this._messenger.textFrame = actionResult.msgChange.timeFrame;
+                    this._messenger.firstMsg = actionResult.msgChange.value;
+                }
             }
         }
         if (this._gameArea.key && this._gameArea.key == 83) {
-            this._actionOnEntities.tryTalkToNpc(this._npcs, this._hero, this._msgs, this, this._items);
+            const talkResult: ActionResult = this._actionOnEntities.tryTalkToNpc(this._npcs, this._hero);
+            if (talkResult.msgChange) {
+                this._messenger.textFrame = talkResult.msgChange.timeFrame;
+                this._messenger.firstMsg = talkResult.msgChange.value;
+                if (talkResult.msgChange.value2) {
+                    this._messenger.secondMsg = talkResult.msgChange.value2;
+                }
+            }
             this._gameArea.key = undefined;
         }
         if (this._gameArea.key && this._gameArea.key == 72) {
-            this._msgs[0].text = texts[12];
-            this._msgs[1].text = texts[13];
-            this._textFrame = -600;
+            this._messenger.firstMsg = texts[12];
+            this._messenger.secondMsg = texts[13];
+            this._messenger.textFrame = -600;
         }
         if (this._gameArea.key === undefined) {
             this._hero.sourceX = 16;
