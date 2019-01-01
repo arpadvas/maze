@@ -9,7 +9,7 @@ import { find } from 'lodash';
 import { Door } from "./door";
 import { Chest } from "./chest";
 import { Pot } from "./pot";
-import { ActionResult, MessegeChange } from "../interfaces/action-result";
+import { ActionResult, MessageChange } from "../interfaces/action-result";
 
 export class ActionOnEntities {
 
@@ -18,7 +18,7 @@ export class ActionOnEntities {
             if (key === 79) {
                 if (this.checkIfItemClose(items[i], hero) && items[i] instanceof Door) {
                     if (items[i].canBeActioned) {
-                        const doorActionResult: [boolean, MessegeChange] = this.performDoorAction(items[i], sounds);
+                        const doorActionResult: [boolean, MessageChange] = this.performDoorAction(items[i], sounds);
                         if (doorActionResult) {
                             if (doorActionResult[0]) {
                                 return {
@@ -35,7 +35,7 @@ export class ActionOnEntities {
                     }
                 } else if (this.checkIfItemClose(items[i], hero) && items[i] instanceof Chest) {
                     if (items[i].canBeActioned) {
-                        const chestActionResult: [boolean, MessegeChange] = this.performChestAction(items[i], sounds);
+                        const chestActionResult: [boolean, MessageChange] = this.performChestAction(items[i], sounds);
                         if (chestActionResult) {
                             if (chestActionResult[1]) {
                                 return {
@@ -57,7 +57,7 @@ export class ActionOnEntities {
             } else if (key === 84) {
                 if (this.checkIfItemClose(items[i], hero) && items[i] instanceof Toggle) {
                     if (items[i].canBeActioned) {
-                        const toggleActionResult: [boolean, MessegeChange] = this.performToggleAction(items[i], sounds);
+                        const toggleActionResult: [boolean, MessageChange] = this.performToggleAction(items[i], sounds);
                         if (toggleActionResult) {
                             if (toggleActionResult[1]) {
                                 return {
@@ -79,7 +79,7 @@ export class ActionOnEntities {
             } else if (key === 66) {
                 if (this.checkIfItemClose(items[i], hero) && items[i] instanceof Pot) {
                     if (items[i].canBeActioned) {
-                        const potActionResult: [boolean, MessegeChange] = this.performPotAction(items[i], sounds);
+                        const potActionResult: [boolean, MessageChange] = this.performPotAction(items[i], sounds);
                         if (potActionResult) {
                             if (potActionResult[0]) {
                                 return {
@@ -108,7 +108,7 @@ export class ActionOnEntities {
         return null;
     }
 
-    private performPotAction(item: Item, sounds: Sound[]): [boolean, MessegeChange] {
+    private performPotAction(item: Item, sounds: Sound[]): [boolean, MessageChange] {
         if (!item.locked) {
             if (item.acted === 0) {
                 const jarbreakSound: Sound = find(sounds, ['type', GameSoundType.JarbreakSound]);
@@ -129,7 +129,7 @@ export class ActionOnEntities {
         }
     }
 
-    private performChestAction(item: Item, sounds: Sound[]): [boolean, MessegeChange] {
+    private performChestAction(item: Item, sounds: Sound[]): [boolean, MessageChange] {
         if (!item.locked) {
             if (item.acted === 0) {
                 const chestSound: Sound = find(sounds, ['type', GameSoundType.ChestSound]);
@@ -150,7 +150,7 @@ export class ActionOnEntities {
         return [false, null];
     }
 
-    private performDoorAction(item: Item, sounds: Sound[]): [boolean, MessegeChange] {
+    private performDoorAction(item: Item, sounds: Sound[]): [boolean, MessageChange] {
         if (!item.locked) {
             if (item.acted === 0) {
                 const doorSound: Sound = find(sounds, ['type', GameSoundType.DoorSound]);
@@ -171,7 +171,7 @@ export class ActionOnEntities {
         }
     }
 
-    private performToggleAction(item: Item, sounds: Sound[]): [boolean, MessegeChange] {
+    private performToggleAction(item: Item, sounds: Sound[]): [boolean, MessageChange] {
         if (!item.locked) {
             if (item.acted === 0) {
                 const toggleSound: Sound = find(sounds, ['type', GameSoundType.SwitchSound]);
@@ -215,7 +215,7 @@ export class ActionOnEntities {
             if (this.checkIfItemClose(npcs[i], hero) && npcs[i].acted === 0) {
                 npcs[i].acted = 1;
                 return {
-                    item: null,
+                    npc: npcs[i],
                     msgChange: {
                         timeFrame: -600,
                         value: texts[6],
@@ -224,7 +224,7 @@ export class ActionOnEntities {
                 }
             } else if (this.checkIfItemClose(npcs[i], hero) && npcs[i].acted === 1) {
                 return {
-                    item: null,
+                    npc: null,
                     msgChange: {
                         timeFrame: 0,
                         value: texts[15]

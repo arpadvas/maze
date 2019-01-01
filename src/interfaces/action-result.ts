@@ -1,12 +1,14 @@
 import { Item } from "../classes/item";
+import { Npc } from "../classes/npc";
 
-export interface MessegeChange {
+export interface MessageChange {
     timeFrame: number;
     value: string;
     value2?: string
 }
 
 export interface ActionResult {
-    item: Item;
-    msgChange: MessegeChange
+    item?: Item;
+    npc?: Npc;
+    msgChange: MessageChange
 }

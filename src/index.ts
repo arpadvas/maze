@@ -12,6 +12,7 @@ import { texts } from './constants/texts';
 import { collisionDetection } from './classes/collision-detection';
 import { actionOnEntities } from './classes/action-on-entities';
 import { Messenger } from './classes/messenger';
+import { actionEffects } from './classes/action-effects';
 
 // start game
 const button: HTMLElement = document.querySelector(".button");
@@ -37,7 +38,8 @@ button.addEventListener("click", () => {
         new Message(texts[0], 130, 15),
         new Message(texts[0], 130, 35)
       ]
-    )
+    ),
+    actionEffects
   );
 });
 

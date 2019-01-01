@@ -14,7 +14,8 @@ import { Npc } from "./npc";
 import { Torch } from "./torch";
 import { ActionOnEntities } from "./action-on-entities";
 import { Messenger } from "./messenger";
-import { ActionResult } from "../interfaces/action-result";
+import { ActionEffects } from "./action-effects";
+import { ActionResult, MessageChange } from "../interfaces/action-result";
 
 export class Game {
 
@@ -34,7 +35,8 @@ export class Game {
     private _collisionDetection: CollisionDetection;
     private _isNeedToPlayBackgroundSound: boolean;
     private _actionOnEntities: ActionOnEntities;
-    private _messenger: Messenger
+    private _messenger: Messenger;
+    private _actionEffects: ActionEffects;
 
     constructor(
             gameArea: GameArea,
@@ -46,7 +48,8 @@ export class Game {
             isNeedToPlayBackgroundSound: boolean,
             collisionDetection: CollisionDetection,
             actionOnEntities: ActionOnEntities,
-            messenger: Messenger
+            messenger: Messenger,
+            actionEffects: ActionEffects
         ) {
         this._nonWalkableArea = [];
         this._gameArea = gameArea;
@@ -67,6 +70,7 @@ export class Game {
         this._collisionDetection = collisionDetection;
         this._actionOnEntities = actionOnEntities;
         this._messenger = messenger;
+        this._actionEffects = actionEffects
         this.startGame();
     }
 
@@ -214,14 +218,26 @@ export class Game {
                     this._messenger.firstMsg = actionResult.msgChange.value;
                 }
             }
+            const afterAction: MessageChange = this._actionEffects.afterAction(this._npcs, this._items);
+            if (afterAction) {
+                this._messenger.textFrame = afterAction.timeFrame;
+                this._messenger.firstMsg = afterAction.value;
+            }
         }
         if (this._gameArea.key && this._gameArea.key == 83) {
             const talkResult: ActionResult = this._actionOnEntities.tryTalkToNpc(this._npcs, this._hero);
-            if (talkResult.msgChange) {
-                this._messenger.textFrame = talkResult.msgChange.timeFrame;
-                this._messenger.firstMsg = talkResult.msgChange.value;
-                if (talkResult.msgChange.value2) {
-                    this._messenger.secondMsg = talkResult.msgChange.value2;
+            if (talkResult) {
+                if (talkResult.msgChange) {
+                    this._messenger.textFrame = talkResult.msgChange.timeFrame;
+                    this._messenger.firstMsg = talkResult.msgChange.value;
+                    if (talkResult.msgChange.value2) {
+                        this._messenger.secondMsg = talkResult.msgChange.value2;
+                    }
+                }
+                const afterAction: MessageChange = this._actionEffects.afterAction(this._npcs, this._items);
+                if (afterAction) {
+                    this._messenger.textFrame = afterAction.timeFrame;
+                    this._messenger.firstMsg = afterAction.value;
                 }
             }
             this._gameArea.key = undefined;
