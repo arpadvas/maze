@@ -30,7 +30,7 @@ button.addEventListener("click", () => {
       new Npc(characterAtlas, 64, 0, 16, 16, 272, 160, 16, 16, false, true, false, 0)
     ],
     gameItems,
-    false,
+    true,
     collisionDetection,
     actionOnEntities,
     new Messenger(
